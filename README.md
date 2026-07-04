@@ -1,2 +1,3 @@
 # Steps-Till-Dawn
-A 2D RPG game about love, lost, and let go.
+This is a 2D pixel RPG game about love, lost, and let go.  
+
