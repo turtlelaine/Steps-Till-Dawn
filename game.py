@@ -14,11 +14,11 @@ pygame.display.set_caption("Steps Till Dawn")
 clock = pygame.time.Clock()
 
 # background
-bg = pygame.image.load("background.png").convert()
+bg = pygame.image.load("assets/backgrounds/background.png").convert()
 bg = pygame.transform.scale(bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Obstacle mask (map)
-collision_map = pygame.image.load("collision.png").convert_alpha()
+collision_map = pygame.image.load("assets/objects/room1/collision.png").convert_alpha()
 collision_map = pygame.transform.scale(collision_map, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 def is_walkable(px, py):
@@ -31,13 +31,13 @@ def is_walkable(px, py):
 
 # load interactive object
 object_files = [
-    ("Bed.png", "Bed", "Do you want to go to sleep?"),
-    ("Chair.png", "Chair", "Chair."),
-    ("Bed_desk.png", "Bed desk", "A small desk near the bed."),
-    ("Closet.png", "Closet", "Just some clothes inside"),
-    ("Desk.png", "Desk", "There's a diary on it"),
-    ("Diary.png", "Diary", "Do you want to read the diary?"),
-    ("Clock.png", "Clock", "It's not working."),
+    ("assets/objects/room1/Bed.png", "Bed", "Do you want to go to sleep?"),
+    ("assets/objects/room1/Chair.png", "Chair", "Chair."),
+    ("assets/objects/room1/Bed_desk.png", "Bed desk", "A small desk near the bed."),
+    ("assets/objects/room1/Closet.png", "Closet", "Just some clothes inside"),
+    ("assets/objects/room1/Desk.png", "Desk", "There's a diary on it"),
+    ("assets/objects/room1/Diary.png", "Diary", "Do you want to read the diary?"),
+    ("assets/objects/room1/Clock.png", "Clock", "It's not working."),
 ]
 
 objects_surfaces = []
@@ -80,7 +80,7 @@ def create_obstacle_mask():
 obstacle_mask = create_obstacle_mask()
 
 # Character animation
-sample_frame = pygame.image.load("walk_1.png").convert_alpha()
+sample_frame = pygame.image.load("assets/characters/Zyrou/walk_1.PNG").convert_alpha()
 frame_width, frame_height = sample_frame.get_width(), sample_frame.get_height()
 CHAR_HEIGHT = 60
 CHAR_WIDTH = int(CHAR_HEIGHT * (frame_width / frame_height))
@@ -88,7 +88,7 @@ CHAR_WIDTH = int(CHAR_HEIGHT * (frame_width / frame_height))
 walk_frames = []
 walk_masks = []
 for i in range(1, 5):
-    frame = pygame.image.load(f"walk_{i}.png").convert_alpha()
+    frame = pygame.image.load(f"assets/characters/Zyrou/walk_{i}.PNG").convert_alpha()
     frame = pygame.transform.scale(frame, (CHAR_WIDTH, CHAR_HEIGHT))
     walk_frames.append(frame)
     walk_masks.append(mask.from_surface(frame))
