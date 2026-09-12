@@ -525,7 +525,7 @@ class Game:
 
         # interaction hint
         if self.near_object and not self.dialogue_choices:
-            font = pygame.font.Font(None, 24)
+            font = pygame.font.Font(None, 20)
             hint_text = font.render("[SPACE]", True, (255, 255, 255))
             hint_rect = hint_text.get_rect(center=(self.near_object["x"], self.near_object["y"] - 40))
             self.screen.blit(hint_text, hint_rect)
