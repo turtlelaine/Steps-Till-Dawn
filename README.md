@@ -5,6 +5,6 @@ In this story, you need to find a way to bring your closest person back to life.
 The game includes 5 endings, collect all of them to unlock the hidden story :)
 
 ## Game Control
-- `AWSD`/ `arrows` : Move
-- `Q`: Save game
-- `R`: Run
+- `arrows` : Move
+- `Esc`: Save game
+- `i`: Open inventory
