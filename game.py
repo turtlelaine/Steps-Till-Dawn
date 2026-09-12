@@ -1,6 +1,7 @@
 import pygame
 import sys
 from pygame import mask
+from story import STORY
 
 class Scene:
     def __init__(self, screen, bg_path, collision_path, object_files, portals):
@@ -239,6 +240,17 @@ class Game:
         self.interact_text = ""
         self.text_timer = 0
 
+        # story setting
+        self.story_active = False
+        self.story_id = None
+        self.story_line_index = 0
+        self.story_lines = []
+        self.story_choices = None
+        self.sleep_count = 0             # ending 1
+        self.triggered_stories = set()   # ending count
+
+        self.start_story("intro")
+
     def spawn_key(self, key_name, dialog):
         filename = f"assets/objects/corridor/{key_name}.png"
         try:
@@ -267,6 +279,71 @@ class Game:
                 self.scenes["room2"].obstacle_mask = self.scenes["room2"].create_obstacle_mask()
         except FileNotFoundError:
             print(f" {filename} not found")
+
+    def start_story(self, story_id):
+
+        self.story_active = True
+        self.story_id = story_id
+        self.story_line_index = 0
+        self.story_lines = STORY[story_id]["lines"]
+        self.story_choices = None
+
+    def next_story_line(self):
+        if self.story_line_index < len(self.story_lines) - 1:
+            self.story_line_index += 1
+        else:
+            # to check if there's next dialogue
+            story = STORY[self.story_id]
+
+            if story.get("choices"):
+                self.dialogue_choices = [c[0] for c in story["choices"]]
+                self.selected_choice = 0
+                self.story_choices = story["choices"]
+            else:
+                self.end_story()
+
+    def end_story(self):
+        story = STORY[self.story_id]
+
+        on_end = story.get("on_end")
+        if on_end:
+            self.handle_story_action(on_end)
+            return
+
+        next_story = story.get("next")
+        if next_story:
+            self.start_story(next_story)
+            return
+
+        self.story_active = False
+        self.story_id = None
+        self.story_lines = []
+        self.story_line_index = 0
+        self.story_choices = None
+        self.dialogue_choices = None
+
+    def handle_story_action(self, action):
+        if action == "go_to_rooftop":
+            self.change_scene("rooftop", (400, 250))
+
+        elif action == "sleep_count":
+            self.sleep_count += 1
+            print(f"Sleep count: {self.sleep_count}")
+
+            if self.sleep_count >= 3:
+                self.start_story("ending1")
+            else:
+                self.story_active = False
+                self.story_id = None
+                self.story_lines = []
+                self.story_line_index = 0
+                self.story_choices = None
+                self.dialogue_choices = None
+
+        elif action == "ending":
+            self.endings_seen.add(self.story_id)
+            print(f"You get: {self.story_id}")
+            self.exit_requested = True
 
     def check_all_endings(self):
         # to check if all endings are checked --> unlock key 3
@@ -297,32 +374,45 @@ class Game:
         if self.near_object:
             name = self.near_object["name"]
 
-            # bookshelf --> show choices
-            if name == "Book shelf":
+            # trigger clock
+            if name == "Clock":
+                if "clock_found" not in self.triggered_stories:
+                    self.triggered_stories.add("clock_found")
+                    self.start_story("clock_found")
+                else:
+                    # 已經看過了，顯示普通對話
+                    self.interact_text = "The clock is still stopped."
+                    self.text_timer = 120
+
+            # trigger sleep
+            elif name == "Bed":
+                self.start_story("go_sleep")
+
+            # book shelf
+            elif name == "Book shelf":
                 self.interact_text = self.near_object["dialog"]
                 self.text_timer = 120
                 self.dialogue_choices = ["Check", "Leave"]
                 self.selected_choice = 0
 
-            # collect key(s) (I wanna go to bed so bad ngl)
+            # key
             elif "key" in name:
                 self.inventory.append(name)
                 self.keys_collected.add(name)
                 self.interact_text = f"{name} is now in your bag."
                 self.text_timer = 120
-                print("Key1 is now in your inventory.")
+                print(f"{name} is now in your inventory.")
 
                 for i, obj in enumerate(self.scene.interaction_data):
                     if obj["name"] == name:
-                        # delete interaction data so that u wont get it again and again
                         self.scene.interaction_data.pop(i)
-                        # remove image
                         if i < len(self.scene.objects_surfaces):
                             self.scene.objects_surfaces.pop(i)
                         break
 
                 self.scene.obstacle_mask = self.scene.create_obstacle_mask()
 
+            # blabla
             else:
                 self.interact_text = self.near_object["dialog"]
                 self.text_timer = 120
@@ -397,6 +487,33 @@ class Game:
         return True
 
     def update(self):
+
+        if self.story_active:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.exit_requested = True
+                if event.type == pygame.KEYDOWN:
+                    if self.dialogue_choices:
+                        if event.key == pygame.K_UP:
+                            self.selected_choice = (self.selected_choice - 1) % len(self.dialogue_choices)
+                        if event.key == pygame.K_DOWN:
+                            self.selected_choice = (self.selected_choice + 1) % len(self.dialogue_choices)
+                        if event.key == pygame.K_SPACE:
+                            chosen = self.story_choices[self.selected_choice]
+                            next_story_id = chosen[1]
+                            self.dialogue_choices = None
+                            self.story_choices = None
+
+                            if next_story_id:
+                                self.start_story(next_story_id)
+                            else:
+                                self.end_story()
+                    else:
+                        if event.key == pygame.K_SPACE:
+                            self.next_story_line()
+            return  # stop interaction during story
+
+        self.near_object = self.check_near_object()
         self.near_object = self.check_near_object()
         char_rect = pygame.Rect(self.x, self.y, self.char_width, self.char_height)
         self.current_portal = self.scene.check_portal(char_rect)
@@ -499,6 +616,10 @@ class Game:
             self.frame_counter = 0
 
     def draw(self):
+        if self.story_active:
+            self.draw_story()
+            return
+
         self.scene.draw()
 
         # coordination assist
@@ -585,6 +706,36 @@ class Game:
             hint_font = pygame.font.Font(None, 22)
             hint = hint_font.render("Press I to close", True, (200, 200, 200))
             hint_rect = hint.get_rect(center=(self.SCREEN_WIDTH // 2, self.SCREEN_HEIGHT // 2 + 120))
+            self.screen.blit(hint, hint_rect)
+
+    def draw_story(self):
+        self.screen.fill((0, 0, 0))
+
+        # show current convo
+        if self.story_lines and self.story_line_index < len(self.story_lines):
+            font = pygame.font.Font(None, 36)
+            line_text = self.story_lines[self.story_line_index]
+            text_surface = font.render(line_text, True, (255, 255, 255))
+            text_rect = text_surface.get_rect(center=(self.SCREEN_WIDTH // 2, self.SCREEN_HEIGHT // 2))
+            self.screen.blit(text_surface, text_rect)
+
+        # show options
+        if self.dialogue_choices:
+            choice_font = pygame.font.Font(None, 32)
+            start_y = self.SCREEN_HEIGHT // 2 + 60
+
+            for i, choice in enumerate(self.dialogue_choices):
+                color = (255, 255, 0) if i == self.selected_choice else (180, 180, 180)
+                prefix = "> " if i == self.selected_choice else "  "
+                choice_text = choice_font.render(f"{prefix}{choice}", True, color)
+                choice_rect = choice_text.get_rect(center=(self.SCREEN_WIDTH // 2, start_y + i * 40))
+                self.screen.blit(choice_text, choice_rect)
+
+        # hint
+        if not self.dialogue_choices:
+            hint_font = pygame.font.Font(None, 24)
+            hint = hint_font.render("Press [SPACE] to continue", True, (120, 120, 120))
+            hint_rect = hint.get_rect(center=(self.SCREEN_WIDTH // 2, self.SCREEN_HEIGHT - 40))
             self.screen.blit(hint, hint_rect)
 
     def save(self):
