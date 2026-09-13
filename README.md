@@ -5,6 +5,8 @@ This is a 2D pixel RPG game about love, lost, and letting go.
 In this story, you need to find a way to bring your closest person back to life. But every step of you may affect your fate, and Every decision you choose may lead to a completely different ending.  
 <img width="2240" height="1400" alt="Room3bg 2" src="https://github.com/user-attachments/assets/1366dcfd-8803-4d5d-a334-3740022ea4c5" />
 
+<img width="2240" height="1400" alt="Room3bg 3" src="https://github.com/user-attachments/assets/a4d2ad5a-e317-4b84-a397-129cd94285ea" />
+
 
 The game includes different endings, collect all of them to unlock the hidden room and hidden story :) 
 
