@@ -28,4 +28,8 @@ Reference (tutorial):
 https://youtu.be/tJiKYMQJnYg?si=fmmF3sYKbU2sBsAI (collision map)
 https://youtu.be/__mZO-53PPM?si=SRh9qqoho6ruJoFU (how to save and load)
 
+Original story:
+https://youtu.be/Sh820Sh9ffQ?si=uLel9zMxDBi2LJZQ
+
 All visuals are drew by me.
+Have fun :D
