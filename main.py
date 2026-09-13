@@ -45,19 +45,41 @@ LOADGAME_RECT = loadgame_cov.get_bounding_rect()
 EXIT_RECT = exit_cov.get_bounding_rect()
 
 STATE_MENU = "menu"
+STATE_LOAD = "load"
 STATE_GAME = "game"
 current_state = STATE_MENU
 game = None
 
-SAVE_FILE = "save.json"
+SAVE_FILE = ".venv/save.json"
 
 def has_save():
     return os.path.exists(SAVE_FILE)
 
+def get_save_slots():
+    import json
+    import os
+    slots = []
+    for i in range(1, 4):
+        filename = f"save_slot_{i}.json"
+        if os.path.exists(filename):
+            with open(filename, "r") as f:
+                data = json.load(f)
+            slots.append({
+                "slot": i,
+                "time": data.get("time", "Unknown"),
+                "scene": data.get("scene", "Unknown"),
+            })
+        else:
+            slots.append({
+                "slot": i,
+                "time": "Empty",
+                "scene": "",
+            })
+    return slots
+
 # Main loop
 running = True
 while running:
-    # only main page reads mouse
     if current_state == STATE_MENU:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -66,39 +88,70 @@ while running:
                 mouse_pos = pygame.mouse.get_pos()
 
                 if NEWGAME_RECT.collidepoint(mouse_pos):
-                    print("new game")
                     game = Game(screen)
                     current_state = STATE_GAME
 
                 elif LOADGAME_RECT.collidepoint(mouse_pos):
-                    if has_save():
-                        print("you read the diary and choose to come back.")
-                        game = Game(screen)
-                        game.load()
-                        current_state = STATE_GAME
-                    else:
-                        print("You did not write anything in the diary yet.")
+                    current_state = STATE_LOAD
 
                 elif EXIT_RECT.collidepoint(mouse_pos):
-                    print("Good morning, player, and goodbye.")
                     running = False
 
-    # independent state
-    elif current_state == STATE_GAME:
-        if game:
-            game.update()
-            game.draw()
-            if game.should_exit():
-                game.save()
-                current_state = STATE_MENU
-                game = None
-
-    if current_state == STATE_MENU:
         screen.blit(menu_bg, (0, 0))
         screen.blit(title_img, (0, 0))
         screen.blit(newgame_img, (0, 0))
         screen.blit(loadgame_img, (0, 0))
         screen.blit(exit_img, (0, 0))
+
+    elif current_state == STATE_LOAD:
+        screen.fill((0, 0, 0))
+
+        font = pygame.font.Font(None, 36)
+        title = font.render("Select Save Slot", True, (255, 255, 255))
+        title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, 50))
+        screen.blit(title, title_rect)
+
+        slots = get_save_slots()
+        slot_rects = []
+        for i, slot in enumerate(slots):
+            y = 150 + i * 80
+            rect = pygame.Rect(100, y, 600, 60)
+            pygame.draw.rect(screen, (50, 50, 50), rect)
+            pygame.draw.rect(screen, (255, 255, 255), rect, 2)
+
+            slot_font = pygame.font.Font(None, 28)
+            if slot["time"] == "Empty":
+                text = slot_font.render(f"Slot {slot['slot']}: Empty", True, (100, 100, 100))
+            else:
+                text = slot_font.render(f"Slot {slot['slot']}: {slot['time']}", True, (255, 255, 255))
+            screen.blit(text, (120, y + 20))
+            slot_rects.append((rect, slot))
+
+        back_font = pygame.font.Font(None, 24)
+        back = back_font.render("[ESC] Back", True, (200, 200, 200))
+        screen.blit(back, (20, SCREEN_HEIGHT - 40))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    current_state = STATE_MENU
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                for rect, slot in slot_rects:
+                    if rect.collidepoint(mouse_pos) and slot["time"] != "Empty":
+                        game = Game(screen)
+                        game.load_slot(slot["slot"])
+                        current_state = STATE_GAME
+
+    elif current_state == STATE_GAME:
+        if game:
+            game.update()
+            game.draw()
+            if game.should_exit():
+                current_state = STATE_MENU
+                game = None
 
     pygame.display.flip()
     clock.tick(60)

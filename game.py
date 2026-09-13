@@ -1,5 +1,4 @@
 import pygame
-import sys
 from pygame import mask
 from story import STORY
 from scene import Scene
@@ -160,7 +159,7 @@ class Game:
         self.seren_frames_flipped = []
         self.seren_frame_index = 0
         self.seren_frame_counter = 0
-        self.seren_animation_speed = 8  # 每 8 幀換一張
+        self.seren_animation_speed = 8
 
         for i in range(1, 5):
             frame = pygame.image.load(f"assets/characters/Seren/seren{i}.PNG").convert_alpha()
@@ -216,20 +215,13 @@ class Game:
         self.start_story("intro")
 
         # scene settings
-        self.seren_x = 600
-        self.seren_y = 250
-        self.seren_visible = False
-        self.seren_reached = False
-        self.seren_img = None
-
         self.timer_active = False
         self.timer_start = 0
-        self.timer_duration = 5
+        self.timer_duration = 2.5
         self.loop_count = 0
         self.fade_next_story = None
 
         self.rooftop_triggered = False
-        self.clock_touched_again = False
 
         self.story_position = "center"
         self.tv_disabled = False
@@ -328,12 +320,7 @@ class Game:
             self.start_story(next_story)
             return
 
-        self.story_active = False
-        self.story_id = None
-        self.story_lines = []
-        self.story_line_index = 0
-        self.story_choices = None
-        self.dialogue_choices = None
+        self.clear_story()
 
     def clear_story(self):
         self.story_active = False
@@ -360,12 +347,7 @@ class Game:
             self.seren_visible = False
             self.seren_reached = True
 
-            self.story_active = False
-            self.story_id = None
-            self.story_lines = []
-            self.story_line_index = 0
-            self.story_choices = None
-            self.dialogue_choices = None
+            self.clear_story()
 
             self.fade_state = "fade_in"
             self.fade_alpha = 255
@@ -378,12 +360,7 @@ class Game:
             self.change_scene("room1", (400, 250))
             self.facing_right = True
 
-            self.story_active = False
-            self.story_id = None
-            self.story_lines = []
-            self.story_line_index = 0
-            self.story_choices = None
-            self.dialogue_choices = None
+            self.clear_story()
 
             self.fade_state = "fade_in"
             self.fade_alpha = 255
@@ -396,21 +373,11 @@ class Game:
             self.timer_active = True
             self.timer_start = pygame.time.get_ticks()
 
-            self.story_active = False
-            self.story_id = None
-            self.story_lines = []
-            self.story_line_index = 0
-            self.story_choices = None
-            self.dialogue_choices = None
+            self.clear_story()
             return
 
         elif action == "fade_to_black":
-            self.story_active = False
-            self.story_id = None
-            self.story_lines = []
-            self.story_line_index = 0
-            self.story_choices = None
-            self.dialogue_choices = None
+            self.clear_story()
 
             self.fade_state = "fade_in"
             self.fade_alpha = 255
@@ -421,12 +388,7 @@ class Game:
             self.change_scene("room1", (400, 250))
             self.facing_right = True
 
-            self.story_active = False
-            self.story_id = None
-            self.story_lines = []
-            self.story_line_index = 0
-            self.story_choices = None
-            self.dialogue_choices = None
+            self.clear_story()
 
             self.fade_state = "fade_in"
             self.fade_alpha = 255
@@ -437,12 +399,7 @@ class Game:
             self.change_scene("room1", (400, 250))
             self.facing_right = True
 
-            self.story_active = False
-            self.story_id = None
-            self.story_lines = []
-            self.story_line_index = 0
-            self.story_choices = None
-            self.dialogue_choices = None
+            self.clear_story()
 
             self.fade_state = "fade_in"
             self.fade_alpha = 255
@@ -459,12 +416,7 @@ class Game:
             self.seren_visible = True
             self.seren_reached = False
             self.first_rooftop = False
-            self.story_active = False
-            self.story_id = None
-            self.story_lines = []
-            self.story_line_index = 0
-            self.story_choices = None
-            self.dialogue_choices = None
+            self.clear_story()
 
             if self.loop_count >= 3:
                 self.seren_attempts = 3
@@ -485,12 +437,7 @@ class Game:
             self.change_scene("room1", (400, 250))
             self.facing_right = True
 
-            self.story_active = False
-            self.story_id = None
-            self.story_lines = []
-            self.story_line_index = 0
-            self.story_choices = None
-            self.dialogue_choices = None
+            self.clear_story()
 
             self.fade_state = "fade_in"
             self.fade_alpha = 255
@@ -535,7 +482,6 @@ class Game:
             self.clear_story()
             return
 
-
         elif action == "tv_on":
             self.clear_story()
             self.fade_state = "fade_in"
@@ -579,12 +525,7 @@ class Game:
             self.sleep_count += 1
             print(f"Sleep count: {self.sleep_count}")
 
-            self.story_active = False
-            self.story_id = None
-            self.story_lines = []
-            self.story_line_index = 0
-            self.story_choices = None
-            self.dialogue_choices = None
+            self.clear_story()
 
             if self.sleep_count >= 3:
                 self.start_story("ending1")
@@ -859,7 +800,6 @@ class Game:
             return  # stop interaction during story
 
         self.near_object = self.check_near_object()
-        self.near_object = self.check_near_object()
         char_rect = pygame.Rect(self.x, self.y, self.char_width, self.char_height)
         self.current_portal = self.scene.check_portal(char_rect)
 
@@ -872,6 +812,10 @@ class Game:
                 # press i open inventory
                 if event.key == pygame.K_i:
                     self.show_inventory = not self.show_inventory
+
+                # press s to save
+                if event.key == pygame.K_s:
+                    self.save_slot()
 
                 # choice control
                 if self.dialogue_choices:
@@ -1195,8 +1139,101 @@ class Game:
                     hint_rect = hint.get_rect(center=(self.SCREEN_WIDTH // 2, self.SCREEN_HEIGHT - 40))
                     self.screen.blit(hint, hint_rect)
 
-    def save(self):
+    def load_slot(self, slot_num):
         import json
+        import os
+        filename = f"save_slot_{slot_num}.json"
+        if os.path.exists(filename):
+            with open(filename, "r") as f:
+                data = json.load(f)
+
+            # load location
+            self.current_scene_name = data.get("scene", "room1")
+            self.scene = self.scenes[self.current_scene_name]
+            self.x = data.get("x", self.SCREEN_WIDTH // 2)
+            self.y = data.get("y", self.SCREEN_HEIGHT // 2)
+            self.facing_right = data.get("facing_right", True)
+
+            # load key status
+            self.keys_spawned = set(data.get("keys_spawned", []))
+            self.keys_collected = set(data.get("keys_collected", []))
+            self.inventory = data.get("inventory", [])
+            self.bookshelf_checked = data.get("bookshelf_checked", 0)
+
+            # load stories process
+            self.triggered_stories = set(data.get("triggered_stories", []))
+            self.loop_count = data.get("loop_count", 0)
+            self.sleep_count = data.get("sleep_count", 0)
+
+            # load kitchen
+            self.kitchen_unlocked = data.get("kitchen_unlocked", False)
+            self.tv_opened = data.get("tv_opened", False)
+            self.tv_disabled = data.get("tv_disabled", False)
+
+            # load endings
+            self.endings_seen = set(data.get("endings_seen", []))
+            self.true_ending_unlocked = data.get("true_ending_unlocked", False)
+
+            # 彩蛋：D
+            self.books_checked = data.get("books_checked", False)
+
+            # restart status
+            self.clear_story()
+            self.fade_state = None
+            self.fade_alpha = 0
+            self.fade_next_story = None
+            self.timer_active = False
+            self.kitchen_timer_active = False
+
+            # reset seren status
+            self.seren_visible = data.get("seren_visible", False)
+            self.seren_scene = data.get("seren_scene", None)
+            self.seren_x = data.get("seren_x", 600)
+            self.seren_y = data.get("seren_y", 250)
+            self.seren_facing_right = data.get("seren_facing_right", False)
+            self.seren_reached = data.get("seren_reached", False)
+            self.first_rooftop = data.get("first_rooftop", False)
+            self.rooftop_triggered = data.get("rooftop_triggered", False)
+
+            print(f"loaded slot {slot_num}")
+            return True
+        return False
+
+    def save_slot(self):
+        import json
+        import os
+        from datetime import datetime
+
+        # read current save
+        slots = []
+        for i in range(1, 4):
+            filename = f"save_slot_{i}.json"
+            if os.path.exists(filename):
+                with open(filename, "r") as f:
+                    slots.append(json.load(f))
+            else:
+                slots.append(None)
+
+        # wheres walley(check for empty slot)
+        empty_slot = None
+        for i, slot in enumerate(slots):
+            if slot is None:
+                empty_slot = i + 1
+                break
+
+        # cover oldest slot if no empty
+        if empty_slot is None:
+            oldest_time = None
+            oldest_slot = 1
+            for i, slot in enumerate(slots):
+                if slot:
+                    slot_time = slot.get("time", "")
+                    if oldest_time is None or slot_time < oldest_time:
+                        oldest_time = slot_time
+                        oldest_slot = i + 1
+            empty_slot = oldest_slot
+
+        # save all process
         data = {
             "scene": self.current_scene_name,
             "x": self.x,
@@ -1207,30 +1244,33 @@ class Game:
             "inventory": self.inventory,
             "bookshelf_checked": self.bookshelf_checked,
             "endings_seen": list(self.endings_seen),
+            "loop_count": self.loop_count,
+            "sleep_count": self.sleep_count,
+            "kitchen_unlocked": self.kitchen_unlocked,
+            "tv_opened": self.tv_opened,
+            "triggered_stories": list(self.triggered_stories),
+            "books_checked": self.books_checked,
+            "tv_disabled": self.tv_disabled,
+            "true_ending_unlocked": self.true_ending_unlocked,
+            "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "name": f"Slot {empty_slot}",
+            "seren_visible": self.seren_visible,
+            "seren_scene": self.seren_scene,
+            "seren_x": self.seren_x,
+            "seren_y": self.seren_y,
+            "seren_facing_right": self.seren_facing_right,
+            "seren_reached": self.seren_reached,
+            "first_rooftop": self.first_rooftop,
+            "rooftop_triggered": self.rooftop_triggered,
         }
-        with open("save.json", "w") as f:
-            json.dump(data, f)
-        print("Noted.")
 
-    def load(self):
-        import json
-        import os
-        if os.path.exists("save.json"):
-            with open("save.json", "r") as f:
-                data = json.load(f)
-            self.current_scene_name = data.get("scene", "room1")
-            self.scene = self.scenes[self.current_scene_name]
-            self.x = data.get("x", self.SCREEN_WIDTH // 2)
-            self.y = data.get("y", self.SCREEN_HEIGHT // 2)
-            self.facing_right = data.get("facing_right", True)
-            self.keys_spawned = set(data.get("keys_spawned", []))
-            self.keys_collected = set(data.get("keys_collected", []))
-            self.inventory = data.get("inventory", [])
-            self.bookshelf_checked = data.get("bookshelf_checked", 0)
-            self.endings_seen = set(data.get("endings_seen", []))
-            print("you start reading your diary...")
-        else:
-            print("you have not write anything on your diary yet.")
+        filename = f"save_slot_{empty_slot}.json"
+        with open(filename, "w") as f:
+            json.dump(data, f)
+
+        print(f"saved to slot {empty_slot}")
+        self.interact_text = f"You wrote your diary at page {empty_slot}"
+        self.text_timer = 120
 
     def check_all_endings(self):
         #to see if all endings collected--> unlock key 3 to room 4
