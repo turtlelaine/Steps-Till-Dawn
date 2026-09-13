@@ -8,7 +8,7 @@ In this story, you need to find a way to bring your closest person back to life.
 <img width="2240" height="1400" alt="Room3bg 3" src="https://github.com/user-attachments/assets/a4d2ad5a-e317-4b84-a397-129cd94285ea" />
 
 
-The game includes different endings, collect all of them to unlock the hidden room and hidden story :) 
+The game includes 5 endings, collect all of them to unlock the hidden room and hidden story :) 
 
 ## Game Control
 - `arrows` : Move
