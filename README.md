@@ -16,10 +16,6 @@ The game includes 5 endings, collect all of them to unlock the hidden room and h
 - `i`: Open inventory
 - `s`: Save  
 
-## AI Disclosure
-Code was written with assistance of Claude AI by Anthropic.
-Art, script, UI/UX and the whole concept were made by me.  
-
 ## Resource
 BGM: 人狼の為の子守唄
 https://dova-s.jp/zh-tw/bgm/detail/2853  
@@ -29,7 +25,11 @@ https://youtu.be/tJiKYMQJnYg?si=fmmF3sYKbU2sBsAI (collision map)
 https://youtu.be/__mZO-53PPM?si=SRh9qqoho6ruJoFU (how to save and load)
 
 Original story:
-https://youtu.be/Sh820Sh9ffQ?si=uLel9zMxDBi2LJZQ
+https://youtu.be/Sh820Sh9ffQ?si=uLel9zMxDBi2LJZQ  
+(I'll be happy if you like it.)
 
-All visuals are drew by me.
+## AI Disclosure
+Code was written with assistance of Claude AI, DeepSeek, and Google Translate.  
+All visuals, script, UI/UX and the whole story concept were made by me.  
+
 Have fun :D
