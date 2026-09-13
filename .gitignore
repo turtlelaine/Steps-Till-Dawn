@@ -1,0 +1,26 @@
+# created by virtualenv automatically
+*
+# Python
+__pycache__/
+*.pyc
+
+# Virtual Environment
+.venv/
+venv/
+myenv/
+
+# PyCharm/IDE
+.idea/
+.junie/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+
+# Save files
+save.json
+save_slot_1.json
+save_slot_2.json
+save_slot_3.json
+endings.json
