@@ -2,6 +2,7 @@ import pygame
 import sys
 import os
 from game import Game
+from scene import Scene
 
 pygame.init()
 pygame.mixer.init()

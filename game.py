@@ -2,95 +2,7 @@ import pygame
 import sys
 from pygame import mask
 from story import STORY
-
-class Scene:
-    def __init__(self, screen, bg_path, collision_path, object_files, portals):
-        self.screen = screen
-        self.SCREEN_WIDTH = screen.get_width()
-        self.SCREEN_HEIGHT = screen.get_height()
-
-        # background
-        self.bg = pygame.image.load(bg_path).convert()
-        self.bg = pygame.transform.scale(self.bg, (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
-
-        # collision map
-        self.collision_map = pygame.image.load(collision_path).convert_alpha()
-        self.collision_map = pygame.transform.scale(self.collision_map, (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
-
-        # objects
-        self.objects_surfaces = []
-        self.interaction_data = []
-
-        for obj in object_files:
-            if len(obj) == 5:
-                filename, name, dialog, custom_pos, radius = obj
-            elif len(obj) == 4:
-                filename, name, dialog, custom_pos = obj
-                radius = 70
-            else:
-                filename, name, dialog = obj
-                custom_pos = None
-                radius = 70
-
-            try:
-                img = pygame.image.load(filename).convert_alpha()
-                orig_width = img.get_width()
-                orig_height = img.get_height()
-
-                img_scaled = pygame.transform.scale(img, (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
-                self.objects_surfaces.append(img_scaled)
-
-                rect = img.get_bounding_rect()
-                if rect.width > 0 and rect.height > 0:
-                    if custom_pos:
-                        scaled_x, scaled_y = custom_pos
-                    else:
-                        orig_x = rect.x + rect.width // 2
-                        orig_y = rect.y + rect.height // 2
-                        scaled_x = int(orig_x * (self.SCREEN_WIDTH / orig_width))
-                        scaled_y = int(orig_y * (self.SCREEN_HEIGHT / orig_height))
-
-                    self.interaction_data.append({
-                        "name": name,
-                        "x": scaled_x,
-                        "y": scaled_y,
-                        "radius": radius,
-                        "dialog": dialog
-                    })
-            except FileNotFoundError:
-                print(f"{filename} not found")
-
-        # collision mask
-        self.obstacle_mask = self.create_obstacle_mask()
-
-        # portals
-        self.portals = portals
-
-    def create_obstacle_mask(self):
-        combined = pygame.Surface((self.SCREEN_WIDTH, self.SCREEN_HEIGHT), pygame.SRCALPHA)
-        for img in self.objects_surfaces:
-            combined.blit(img, (0, 0))
-        return mask.from_surface(combined)
-
-    def is_walkable(self, px, py):
-        if px < 0 or px >= self.SCREEN_WIDTH or py < 0 or py >= self.SCREEN_HEIGHT:
-            return False
-        color = self.collision_map.get_at((int(px), int(py)))
-        if color[0] > 200 and color[1] > 200 and color[2] > 200:
-            return False
-        return True
-
-    def check_portal(self, char_rect):
-        for portal in self.portals:
-            if char_rect.colliderect(portal["rect"]):
-                return portal
-        return None
-
-    def draw(self):
-        self.screen.blit(self.bg, (0, 0))
-        for img in self.objects_surfaces:
-            self.screen.blit(img, (0, 0))
-
+from scene import Scene
 
 class Game:
     def __init__(self, screen):
@@ -111,11 +23,11 @@ class Game:
             [
                 ("assets/objects/room1/Bed.png", "Bed", "Do you want to go to sleep?"),
                 ("assets/objects/room1/Chair.png", "Chair", "Chair."),
-                ("assets/objects/room1/Bed_desk.png", "Bed desk", "A small desk near the bed."),
+                ("assets/objects/room1/Bed_desk.png", "Clock", "A small desk near the bed."),
                 ("assets/objects/room1/Closet.png", "Closet", "Just some clothes inside"),
                 ("assets/objects/room1/Desk.png", "Desk", "There's a diary on it"),
                 ("assets/objects/room1/Diary.png", "Diary", "Do you want to read the diary?"),
-                ("assets/objects/room1/Clock.png", "Clock", "It's not working."),
+                ("assets/objects/room1/Clock.png", "Frame", "It's not working."),
             ],
             portals=[
                 {"rect": pygame.Rect(560, 265, 30, 115), "target": "room2", "spawn": (125, 250),
@@ -124,6 +36,7 @@ class Game:
         )
 
         # scene 2 : corridor
+        self.first_rooftop = False
         self.scenes["room2"] = Scene(
             screen,
             "assets/backgrounds/Corridor.png",
@@ -147,8 +60,8 @@ class Game:
                  "spawn": (14, 240), "name": "Rooftop", "key_required": "key2"},
 
                 # room 2 (key required)
-                {"rect": pygame.Rect(555, 215, 70, 30), "target": "secret_room",
-                 "spawn": (400, 250), "name": "Seren's room", "key_required": "key3"},
+                {"rect": pygame.Rect(555, 215, 70, 30), "target": "room5",
+                 "spawn": (270, 258), "name": "Seren's room", "key_required": "key3"},
             ]
         )
 
@@ -184,6 +97,26 @@ class Game:
             ]
         )
 
+        # scene 5 : room2 (Seren's room)
+        self.scenes["room5"] = Scene(
+            screen,
+            "assets/backgrounds/room3bg.png",
+            "assets/objects/room2/Collision5.png",
+            [
+                ("assets/objects/room2/Bed2.png", "Bed", "Seren's bed. Still comfy."),
+                ("assets/objects/room2/Books.png", "Books", "A stack of books. Some are half-read."),
+                ("assets/objects/room2/Chair2.png", "Chair", "Best chair."),
+                ("assets/objects/room2/Closet2.png", "Closet", "It's a mess inside."),
+                ("assets/objects/room2/Desk2.png", "Desk", "Neatly tidied."),
+                ("assets/objects/room2/Diary2.png", "Diary2", "One glance won't hurt..."),
+                ("assets/objects/room2/Music.png", "Music", "Plays Seren's favorite album."),
+            ],
+            portals=[
+                {"rect": pygame.Rect(250, 268, 48, 30), "target": "room2",
+                 "spawn": (600, 250), "name": "Corridor"}
+            ]
+        )
+
         self.current_scene_name = "room1"
         self.scene = self.scenes[self.current_scene_name]
 
@@ -192,14 +125,15 @@ class Game:
         self.keys_collected = set()        # keys collected
         self.inventory = []
         self.bookshelf_checked = 0
-        self.endings_seen = set()          # endings check
-        self.total_endings = 3             # total endings to check
+        self.kitchen_unlocked = False
+        self.endings_seen = self.load_endings()          # endings check
+        self.total_endings = 5             # total endings to checc
 
         # dialogue system
         self.dialogue_choices = None
         self.selected_choice = 0
 
-        # character animation
+        # Zyrou animation
         sample_frame = pygame.image.load("assets/characters/Zyrou/walk_1.PNG").convert_alpha()
         frame_width, frame_height = sample_frame.get_width(), sample_frame.get_height()
         self.CHAR_HEIGHT = 60
@@ -220,6 +154,30 @@ class Game:
             flipped = pygame.transform.flip(f, True, False)
             self.walk_frames_flipped.append(flipped)
             self.walk_masks_flipped.append(mask.from_surface(flipped))
+
+        # Seren animation
+        self.seren_frames = []
+        self.seren_frames_flipped = []
+        self.seren_frame_index = 0
+        self.seren_frame_counter = 0
+        self.seren_animation_speed = 8  # 每 8 幀換一張
+
+        for i in range(1, 5):
+            frame = pygame.image.load(f"assets/characters/Seren/seren{i}.PNG").convert_alpha()
+            frame = pygame.transform.scale(frame, (self.CHAR_WIDTH, self.CHAR_HEIGHT))
+            self.seren_frames.append(frame)
+
+            flipped = pygame.transform.flip(frame, True, False)
+            self.seren_frames_flipped.append(flipped)
+
+        self.seren_facing_right = False
+        self.seren_scene = None
+
+        self.seren_x = 600
+        self.seren_y = 250
+        self.seren_visible = False
+        self.seren_reached = False
+        self.seren_attempts = 0
 
         # character position
         self.x = self.SCREEN_WIDTH // 2
@@ -248,8 +206,57 @@ class Game:
         self.story_choices = None
         self.sleep_count = 0             # ending 1
         self.triggered_stories = set()   # ending count
+        self.story_alpha = 0             # fade in intro
+        self.story_fade_speed = 4
+        self.fade_state = None
+        self.fade_alpha = 0
+        self.fade_speed = 3
+        self.books_checked = False
 
         self.start_story("intro")
+
+        # scene settings
+        self.seren_x = 600
+        self.seren_y = 250
+        self.seren_visible = False
+        self.seren_reached = False
+        self.seren_img = None
+
+        self.timer_active = False
+        self.timer_start = 0
+        self.timer_duration = 5
+        self.loop_count = 0
+        self.fade_next_story = None
+
+        self.rooftop_triggered = False
+        self.clock_touched_again = False
+
+        self.story_position = "center"
+        self.tv_disabled = False
+        self.true_ending_unlocked = False
+
+        #timer in kitchen scene
+        self.kitchen_timer_active = False
+        self.kitchen_timer_start = 0
+        self.kitchen_timer_duration = 180
+        self.tv_opened = False
+
+        # for ending test
+        #self.endings_seen = {"ending1", "ending2", "ending3", "ending4", "ending5"}
+        #self.check_all_endings()
+
+    def load_endings(self):
+        import json
+        import os
+        if os.path.exists("endings.json"):
+            with open("endings.json", "r") as f:
+                return set(json.load(f))
+        return set()
+
+    def save_endings(self):
+        import json
+        with open("endings.json", "w") as f:
+            json.dump(list(self.endings_seen), f)
 
     def spawn_key(self, key_name, dialog):
         filename = f"assets/objects/corridor/{key_name}.png"
@@ -287,8 +294,14 @@ class Game:
         self.story_line_index = 0
         self.story_lines = STORY[story_id]["lines"]
         self.story_choices = None
+        self.story_alpha = 0
+        self.story_position = STORY[story_id].get("position", "center")
 
     def next_story_line(self):
+        if not self.story_active or self.story_id is None:
+            self.story_active = False
+            return
+
         if self.story_line_index < len(self.story_lines) - 1:
             self.story_line_index += 1
         else:
@@ -322,27 +335,269 @@ class Game:
         self.story_choices = None
         self.dialogue_choices = None
 
+    def clear_story(self):
+        self.story_active = False
+        self.story_id = None
+        self.story_lines = []
+        self.story_line_index = 0
+        self.story_choices = None
+        self.dialogue_choices = None
+
     def handle_story_action(self, action):
         if action == "go_to_rooftop":
-            self.change_scene("rooftop", (400, 250))
+            self.change_scene("rooftop", (400, 248))
+            self.rooftop_triggered = False
+            self.facing_right = True
+            self.seren_scene = "rooftop"
+            self.seren_facing_right = True
+            self.seren_visible = True
+            self.seren_reached = False
+            self.first_rooftop = True
+            self.start_story("rooftop_arrival")
+            return
+
+        elif action == "hide_seren_and_fade":
+            self.seren_visible = False
+            self.seren_reached = True
+
+            self.story_active = False
+            self.story_id = None
+            self.story_lines = []
+            self.story_line_index = 0
+            self.story_choices = None
+            self.dialogue_choices = None
+
+            self.fade_state = "fade_in"
+            self.fade_alpha = 255
+            self.fade_next_story = "rooftop_black"
+            return
+
+        elif action == "hide_seren_and_back":
+            self.seren_visible = False
+
+            self.change_scene("room1", (400, 250))
+            self.facing_right = True
+
+            self.story_active = False
+            self.story_id = None
+            self.story_lines = []
+            self.story_line_index = 0
+            self.story_choices = None
+            self.dialogue_choices = None
+
+            self.fade_state = "fade_in"
+            self.fade_alpha = 255
+            self.fade_next_story = "wake_up"
+            return
+
+        elif action == "hide_seren_and_start_timer":
+            self.seren_visible = False
+
+            self.timer_active = True
+            self.timer_start = pygame.time.get_ticks()
+
+            self.story_active = False
+            self.story_id = None
+            self.story_lines = []
+            self.story_line_index = 0
+            self.story_choices = None
+            self.dialogue_choices = None
+            return
+
+        elif action == "fade_to_black":
+            self.story_active = False
+            self.story_id = None
+            self.story_lines = []
+            self.story_line_index = 0
+            self.story_choices = None
+            self.dialogue_choices = None
+
+            self.fade_state = "fade_in"
+            self.fade_alpha = 255
+            self.fade_next_story = "rooftop_black"
+            return
+
+        elif action == "back_to_room1":
+            self.change_scene("room1", (400, 250))
+            self.facing_right = True
+
+            self.story_active = False
+            self.story_id = None
+            self.story_lines = []
+            self.story_line_index = 0
+            self.story_choices = None
+            self.dialogue_choices = None
+
+            self.fade_state = "fade_in"
+            self.fade_alpha = 255
+            self.fade_next_story = "wake_up"
+            return
+
+        elif action == "back_to_room1_fail_action":
+            self.change_scene("room1", (400, 250))
+            self.facing_right = True
+
+            self.story_active = False
+            self.story_id = None
+            self.story_lines = []
+            self.story_line_index = 0
+            self.story_choices = None
+            self.dialogue_choices = None
+
+            self.fade_state = "fade_in"
+            self.fade_alpha = 255
+            return
+
+        elif action == "loop_count":
+            self.loop_count += 1
+            print(f"Loop count: {self.loop_count}")
+
+            self.change_scene("rooftop", (100, 248))
+            self.facing_right = True
+            self.seren_scene = "rooftop"
+            self.seren_facing_right = True
+            self.seren_visible = True
+            self.seren_reached = False
+            self.first_rooftop = False
+            self.story_active = False
+            self.story_id = None
+            self.story_lines = []
+            self.story_line_index = 0
+            self.story_choices = None
+            self.dialogue_choices = None
+
+            if self.loop_count >= 3:
+                self.seren_attempts = 3
+            else:
+                self.seren_attempts = self.loop_count
+
+            return
+
+        elif action == "final_loop":
+            self.change_scene("room1", (400, 248))
+            self.facing_right = True
+            self.fade_state = "fade_in"
+            self.fade_alpha = 255
+            self.fade_next_story = "ending2"
+            return
+
+        elif action == "back_to_room1_fail":
+            self.change_scene("room1", (400, 250))
+            self.facing_right = True
+
+            self.story_active = False
+            self.story_id = None
+            self.story_lines = []
+            self.story_line_index = 0
+            self.story_choices = None
+            self.dialogue_choices = None
+
+            self.fade_state = "fade_in"
+            self.fade_alpha = 255
+            self.fade_next_story = "wake_up"
+            return
+
+        elif action == "start_timer":
+            self.timer_active = True
+            self.timer_start = pygame.time.get_ticks()
+            return
+
+        elif action == "wake_up_kitchen":
+            self.change_scene("room3", (325, 220))
+            self.facing_right = True
+            self.seren_facing_right = False
+
+            self.seren_x = 385
+            self.seren_y = 220
+            self.seren_scene = "room3"
+            self.seren_visible = True
+            self.seren_reached = True
+            self.kitchen_unlocked = True
+
+            if not any(obj["name"] == "Seren" for obj in self.scenes["room3"].interaction_data):
+                self.scenes["room3"].interaction_data.append({
+                    "name": "Seren",
+                    "x": 385,
+                    "y": 220,
+                    "radius": 70,
+                    "dialog": '"?"'
+                })
+
+            self.clear_story()
+            self.fade_state = "fade_in"
+            self.fade_alpha = 255
+            self.fade_next_story = "wake_up_kitchen"
+            return
+
+        elif action == "start_kitchen_timer":
+            self.kitchen_timer_active = True
+            self.kitchen_timer_start = pygame.time.get_ticks()
+            self.clear_story()
+            return
+
+
+        elif action == "tv_on":
+            self.clear_story()
+            self.fade_state = "fade_in"
+            self.fade_alpha = 255
+            self.fade_next_story = "after_tv"
+            return
+
+        elif action == "back_to_kitchen":
+            self.clear_story()
+            self.fade_state = "fade_in"
+            self.fade_alpha = 255
+            self.fade_next_story = "seren_confront"
+            return
+
+        elif action == "leave_kitchen":
+            self.clear_story()
+            self.seren_visible = True
+            self.seren_scene = "room3"
+            self.seren_facing_right = False
+            self.true_ending_unlocked = True
+            self.tv_disabled = True
+
+            for obj in self.scenes["room3"].interaction_data[:]:
+                if obj["name"] == "Seren":
+                    self.scenes["room3"].interaction_data.remove(obj)
+            return
+
+        elif action == "back_to_room1_true":
+            self.change_scene("room1", (400, 250))
+            self.facing_right = True
+            self.seren_visible = False
+            self.seren_scene = None
+
+            self.clear_story()
+            self.fade_state = "fade_in"
+            self.fade_alpha = 255
+            self.fade_next_story = "true_ending_1"
+            return
 
         elif action == "sleep_count":
             self.sleep_count += 1
             print(f"Sleep count: {self.sleep_count}")
 
+            self.story_active = False
+            self.story_id = None
+            self.story_lines = []
+            self.story_line_index = 0
+            self.story_choices = None
+            self.dialogue_choices = None
+
             if self.sleep_count >= 3:
                 self.start_story("ending1")
             else:
-                self.story_active = False
-                self.story_id = None
-                self.story_lines = []
-                self.story_line_index = 0
-                self.story_choices = None
-                self.dialogue_choices = None
+                self.fade_state = "fade_in"
+                self.fade_alpha = 255
+            return
 
         elif action == "ending":
             self.endings_seen.add(self.story_id)
+            self.save_endings()
             print(f"You get: {self.story_id}")
+            self.check_all_endings()
             self.exit_requested = True
 
     def check_all_endings(self):
@@ -376,13 +631,16 @@ class Game:
 
             # trigger clock
             if name == "Clock":
-                if "clock_found" not in self.triggered_stories:
+                if self.true_ending_unlocked:
+                    self.start_story("before_true_ending")
+                elif "clock_found" not in self.triggered_stories:
                     self.triggered_stories.add("clock_found")
                     self.start_story("clock_found")
-                else:
-                    # 已經看過了，顯示普通對話
+                elif self.loop_count >= 3:
                     self.interact_text = "The clock is still stopped."
                     self.text_timer = 120
+                else:
+                    self.start_story("rewind_again")
 
             # trigger sleep
             elif name == "Bed":
@@ -412,6 +670,40 @@ class Game:
 
                 self.scene.obstacle_mask = self.scene.create_obstacle_mask()
 
+            # Seren (scene kithen)
+            elif name == "Seren":
+                if self.kitchen_unlocked:
+                    self.start_story("seren_talk")
+                else:
+                    self.interact_text = "..."
+                    self.text_timer = 120
+
+            # TV (scene kitchen)
+            elif name == "TV":
+                if self.tv_disabled:
+                    self.interact_text = "..."
+                    self.text_timer = 120
+                elif not self.kitchen_unlocked:
+                    self.interact_text = "The TV is off. You don't feel like watching anything."
+                    self.text_timer = 120
+                elif not self.tv_opened:
+                    self.start_story("tv_interact")
+                else:
+                    self.interact_text = "The TV is already on."
+                    self.text_timer = 120
+
+            # Seren's diary (room2)
+            elif name == "Diary2":
+                self.start_story("seren_diary_1")
+
+            elif name == "Books":
+                if not self.books_checked:
+                    self.books_checked = True
+                    self.start_story("books_secret")
+                else:
+                    self.interact_text = "Just some books."
+                    self.text_timer = 120
+
             # blabla
             else:
                 self.interact_text = self.near_object["dialog"]
@@ -423,28 +715,23 @@ class Game:
 
         choice = self.dialogue_choices[self.selected_choice]
 
-        # === 使用鑰匙開門 ===
+        # open door 1 and rooftop by key 1 2
         if choice.startswith("Use "):
             if self.pending_portal:
-                # 記住要前往的場景
                 target = self.pending_portal["target"]
                 spawn = self.pending_portal["spawn"]
 
-                # 清除選項和待處理的門
                 self.dialogue_choices = None
                 self.pending_portal = None
 
-                # 切換場景
                 self.change_scene(target, spawn)
                 return
 
-        # === 離開 ===
         elif choice == "Leave":
             self.interact_text = ""
             self.text_timer = 0
             self.pending_portal = None
 
-        # === bookshelf 的 Check ===
         elif choice == "Check":
             self.bookshelf_checked += 1
 
@@ -461,6 +748,18 @@ class Game:
             else:
                 self.interact_text = "Nothing else here."
                 self.text_timer = 120
+
+        elif choice == "Turn on":
+            self.kitchen_timer_active = False
+            self.tv_opened = True
+            self.start_story("tv_on_story")
+            return
+
+        elif choice == "Never mind":
+            self.interact_text = "You wanted to do something else."
+            self.text_timer = 0
+            self.dialogue_choices = None
+            return
 
         self.dialogue_choices = None
 
@@ -487,8 +786,54 @@ class Game:
         return True
 
     def update(self):
+        # timer for scene rooftop
+        if self.timer_active:
+            elapsed = (pygame.time.get_ticks() - self.timer_start) / 1000
+            remaining = self.timer_duration - elapsed
+
+            if remaining <= 0:
+                self.timer_active = False
+                self.start_story("ending2")
+                return
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.exit_requested = True
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        self.timer_active = False
+                        self.start_story("rewind_final")
+                        return
+
+
+        # timer for scene kitchen
+        if self.kitchen_timer_active:
+            elapsed = (pygame.time.get_ticks() - self.kitchen_timer_start) / 1000
+            remaining = self.kitchen_timer_duration - elapsed
+            if remaining <= 0:
+                self.kitchen_timer_active = False
+                self.start_story("ending3")
+                return
+
+        # fade in scene
+        if self.fade_state == "fade_in":
+            self.fade_alpha -= self.fade_speed
+            if self.fade_alpha <= 0:
+                self.fade_alpha = 0
+                self.fade_state = None
+            return
+
+        if self.fade_next_story:
+            next_story = self.fade_next_story
+            self.fade_next_story = None
+            self.start_story(next_story)
 
         if self.story_active:
+            if self.story_alpha < 255:
+                self.story_alpha += self.story_fade_speed
+                if self.story_alpha > 255:
+                    self.story_alpha = 255
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.exit_requested = True
@@ -553,7 +898,7 @@ class Game:
                                 # yo theres a key :0 --> show choice
                                 self.dialogue_choices = [f"Use {key_required}", "Leave"]
                                 self.selected_choice = 0
-                                self.pending_portal = self.current_portal  # 記住這個門
+                                self.pending_portal = self.current_portal
                         else:
                             # no key needed --> spawn directly"
                             self.change_scene(
@@ -572,7 +917,33 @@ class Game:
             return
 
         # character movement
+        # rooftop scene story
         keys = pygame.key.get_pressed()
+        if (self.current_scene_name == "rooftop"
+                and self.first_rooftop
+                and not self.rooftop_triggered
+                and keys[pygame.K_RIGHT]):
+            self.rooftop_triggered = True
+            self.start_story("rooftop_trigger")
+            return
+
+        if (self.current_scene_name == "rooftop"
+                and not self.first_rooftop
+                and self.seren_visible
+                and not self.seren_reached):
+
+            char_rect = pygame.Rect(self.x, self.y, self.char_width, self.char_height)
+            seren_rect = pygame.Rect(self.seren_x, self.seren_y, 40, 60)
+
+            if char_rect.colliderect(seren_rect):
+                self.seren_reached = True
+                self.seren_visible = False
+
+                if self.loop_count >= 3:
+                    self.start_story("reach_seren")
+                else:
+                    self.start_story("rooftop_fail")
+                return
         dx, dy = 0, 0
 
         if keys[pygame.K_LEFT]:
@@ -615,12 +986,47 @@ class Game:
             self.current_frame = 0
             self.frame_counter = 0
 
+        if self.seren_visible and self.current_scene_name == self.seren_scene:
+            self.seren_frame_counter += 1
+            if self.seren_frame_counter >= self.seren_animation_speed:
+                self.seren_frame_counter = 0
+                self.seren_frame_index = (self.seren_frame_index + 1) % len(self.seren_frames)
+
     def draw(self):
         if self.story_active:
             self.draw_story()
             return
 
         self.scene.draw()
+
+        if self.seren_visible and self.current_scene_name == self.seren_scene:
+            if self.seren_facing_right:
+                self.screen.blit(self.seren_frames[self.seren_frame_index],
+                                 (self.seren_x, self.seren_y))
+            else:
+                self.screen.blit(self.seren_frames_flipped[self.seren_frame_index],
+                                 (self.seren_x, self.seren_y))
+
+        # timer
+        if self.timer_active:
+            elapsed = (pygame.time.get_ticks() - self.timer_start) / 1000
+            remaining = max(0, self.timer_duration - elapsed)
+
+            timer_font = pygame.font.Font(None, 72)
+            timer_text = timer_font.render(f"{remaining:.1f}", True, (255, 50, 50))
+            timer_rect = timer_text.get_rect(center=(self.SCREEN_WIDTH // 2, 80))
+            self.screen.blit(timer_text, timer_rect)
+
+            hint_font = pygame.font.Font(None, 28)
+            hint = hint_font.render("[SPACE] Rewind time!", True, (255, 255, 255))
+            hint_rect = hint.get_rect(center=(self.SCREEN_WIDTH // 2, self.SCREEN_HEIGHT - 60))
+            self.screen.blit(hint, hint_rect)
+
+        if self.fade_state == "fade_in" and self.fade_alpha > 0:
+            fade_surface = pygame.Surface((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+            fade_surface.fill((0, 0, 0))
+            fade_surface.set_alpha(self.fade_alpha)
+            self.screen.blit(fade_surface, (0, 0))
 
         # coordination assist
         font = pygame.font.Font(None, 24)
@@ -709,34 +1115,85 @@ class Game:
             self.screen.blit(hint, hint_rect)
 
     def draw_story(self):
-        self.screen.fill((0, 0, 0))
+        if self.story_position == "bottom":
+            self.scene.draw()
 
-        # show current convo
+            # character
+            if self.facing_right:
+                self.screen.blit(self.walk_frames[self.current_frame], (self.x, self.y))
+            else:
+                self.screen.blit(self.walk_frames_flipped[self.current_frame], (self.x, self.y))
+
+            # Seren
+            if self.seren_visible and self.current_scene_name == self.seren_scene:
+                if self.seren_facing_right:
+                    self.screen.blit(self.seren_frames[self.seren_frame_index],
+                                     (self.seren_x, self.seren_y))
+                else:
+                    self.screen.blit(self.seren_frames_flipped[self.seren_frame_index],
+                                     (self.seren_x, self.seren_y))
+        else:
+            self.screen.fill((0, 0, 0))
+
+        # show convo
         if self.story_lines and self.story_line_index < len(self.story_lines):
-            font = pygame.font.Font(None, 36)
+            font = pygame.font.Font(None, 32)
             line_text = self.story_lines[self.story_line_index]
             text_surface = font.render(line_text, True, (255, 255, 255))
-            text_rect = text_surface.get_rect(center=(self.SCREEN_WIDTH // 2, self.SCREEN_HEIGHT // 2))
-            self.screen.blit(text_surface, text_rect)
+            text_surface.set_alpha(self.story_alpha)
 
-        # show options
-        if self.dialogue_choices:
-            choice_font = pygame.font.Font(None, 32)
-            start_y = self.SCREEN_HEIGHT // 2 + 60
+            if self.story_position == "bottom":
+                # dialog bubble position: bottom
+                dialog_height = 120
+                dialog_y = self.SCREEN_HEIGHT - dialog_height
 
-            for i, choice in enumerate(self.dialogue_choices):
-                color = (255, 255, 0) if i == self.selected_choice else (180, 180, 180)
-                prefix = "> " if i == self.selected_choice else "  "
-                choice_text = choice_font.render(f"{prefix}{choice}", True, color)
-                choice_rect = choice_text.get_rect(center=(self.SCREEN_WIDTH // 2, start_y + i * 40))
-                self.screen.blit(choice_text, choice_rect)
+                dialog_bg = pygame.Surface((self.SCREEN_WIDTH, dialog_height))
+                dialog_bg.set_alpha(200)
+                dialog_bg.fill((0, 0, 0))
+                self.screen.blit(dialog_bg, (0, dialog_y))
 
-        # hint
-        if not self.dialogue_choices:
-            hint_font = pygame.font.Font(None, 24)
-            hint = hint_font.render("Press [SPACE] to continue", True, (120, 120, 120))
-            hint_rect = hint.get_rect(center=(self.SCREEN_WIDTH // 2, self.SCREEN_HEIGHT - 40))
-            self.screen.blit(hint, hint_rect)
+                pygame.draw.rect(self.screen, (255, 255, 255),
+                                 (10, dialog_y + 10, self.SCREEN_WIDTH - 20, dialog_height - 20), 2)
+
+                text_rect = text_surface.get_rect(topleft=(40, dialog_y + 30))
+                self.screen.blit(text_surface, text_rect)
+
+                if self.dialogue_choices:
+                    choice_font = pygame.font.Font(None, 28)
+                    start_y = dialog_y + 54
+                    for i, choice in enumerate(self.dialogue_choices):
+                        color = (255, 255, 0) if i == self.selected_choice else (180, 180, 180)
+                        prefix = "> " if i == self.selected_choice else "  "
+                        choice_text = choice_font.render(f"{prefix}{choice}", True, color)
+                        choice_text.set_alpha(self.story_alpha)
+                        self.screen.blit(choice_text, (60, start_y + i * 20))
+
+                if not self.dialogue_choices and self.story_alpha >= 255:
+                    hint_font = pygame.font.Font(None, 20)
+                    hint = hint_font.render("[SPACE] ▼", True, (150, 150, 150))
+                    hint_rect = hint.get_rect(bottomright=(self.SCREEN_WIDTH - 30, self.SCREEN_HEIGHT - 20))
+                    self.screen.blit(hint, hint_rect)
+
+            else:
+                text_rect = text_surface.get_rect(center=(self.SCREEN_WIDTH // 2, self.SCREEN_HEIGHT // 2))
+                self.screen.blit(text_surface, text_rect)
+
+                if self.dialogue_choices:
+                    choice_font = pygame.font.Font(None, 32)
+                    start_y = self.SCREEN_HEIGHT // 2 + 60
+                    for i, choice in enumerate(self.dialogue_choices):
+                        color = (255, 255, 0) if i == self.selected_choice else (180, 180, 180)
+                        prefix = "> " if i == self.selected_choice else "  "
+                        choice_text = choice_font.render(f"{prefix}{choice}", True, color)
+                        choice_text.set_alpha(self.story_alpha)
+                        choice_rect = choice_text.get_rect(center=(self.SCREEN_WIDTH // 2, start_y + i * 40))
+                        self.screen.blit(choice_text, choice_rect)
+
+                if not self.dialogue_choices and self.story_alpha >= 255:
+                    hint_font = pygame.font.Font(None, 24)
+                    hint = hint_font.render("Press [SPACE] to continue", True, (120, 120, 120))
+                    hint_rect = hint.get_rect(center=(self.SCREEN_WIDTH // 2, self.SCREEN_HEIGHT - 40))
+                    self.screen.blit(hint, hint_rect)
 
     def save(self):
         import json
