@@ -19,12 +19,33 @@ In this story, you need to find a way to bring your closest person back to life.
 
 The game includes 5 endings, collect all of them to unlock the hidden room and hidden story :) 
 
-## Usage
-run the game: python main.py
+## How to Run
+～～use your leg～～
+
+Download and install Python 3.10+ from [python.org](https://www.python.org/downloads/).
+Windows users: check **"Add Python to PATH"** during installation.
+
+Click the green **`Code`** button → **`Download ZIP`** → unzip it.
+
+Open Terminal (macOS) or Command Prompt (Windows) and run:
+`pip install pygame`  
+or  
+`pip3 install pygame` if it doesn't work. 
+
+In the Terminal, navigate to the folder where you unzipped the game. For example:  
+`cd Downloads/Steps-Till-Dawn-main`  
+
+Then run:
+`python main.py`  
+or  
+`python3 main.py  
+
+Have fun :D
 
 ## Game Control
 - `arrows` : Move
-- `Esc`: Save game
+- `SPACE`: Interact/ continue
+- `Esc`: Quit game
 - `i`: Open inventory
 - `s`: Save  
 
@@ -56,5 +77,3 @@ https://youtu.be/Sh820Sh9ffQ?si=uLel9zMxDBi2LJZQ
 ## AI Disclosure
 Code was written with assistance of Claude AI, DeepSeek, and Google Translate.  
 All visuals, script, UI/UX and the whole story concept were made by me.  
-
-Have fun :D
