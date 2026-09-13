@@ -240,14 +240,14 @@ class Game:
     def load_endings(self):
         import json
         import os
-        if os.path.exists("endings.json"):
-            with open("endings.json", "r") as f:
+        if os.path.exists(".venv/endings.json"):
+            with open(".venv/endings.json", "r") as f:
                 return set(json.load(f))
         return set()
 
     def save_endings(self):
         import json
-        with open("endings.json", "w") as f:
+        with open(".venv/endings.json", "w") as f:
             json.dump(list(self.endings_seen), f)
 
     def spawn_key(self, key_name, dialog):
