@@ -51,16 +51,16 @@ Have fun :D
 
 ## Project Structure
 Steps-Till-Dawn/
-├── main.py              # Entry point
-├── game.py              # Main game logic
-├── scene.py             # Scene class
-├── story.py             # Story data (dialogue, choice, endings)
-├── assets/              # Images and bgm
-├── .gitignore
-├── LICENSE
-├── README.md
-├── requirements.txt
-└── documentation.md
+├── main.py              # Entry point  
+├── game.py              # Main game logic  
+├── scene.py             # Scene class  
+├── story.py             # Story data (dialogue, choice, endings)  
+├── assets/              # Images and bgm  
+├── .gitignore  
+├── LICENSE  
+├── README.md  
+├── requirements.txt  
+└── documentation.md  
 
 ## Resource
 BGM: 人狼の為の子守唄
