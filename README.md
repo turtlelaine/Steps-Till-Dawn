@@ -8,4 +8,8 @@ The game includes different endings, collect all of them to unlock the hidden ro
 - `arrows` : Move
 - `Esc`: Save game
 - `i`: Open inventory
-- `s`: Save
+- `s`: Save  
+
+## AI Disclosure
+Code was written with assistance of Claude AI by Anthropic.
+Art, script, UI/UX and the whole concept were made by me.
