@@ -27,18 +27,18 @@ Windows users: check **"Add Python to PATH"** during installation.
 
 Click the green **`Code`** button → **`Download ZIP`** → unzip it.
 
-Open Terminal (macOS) or Command Prompt (Windows) and run:
+Open Terminal (macOS) or Command Prompt (Windows) and run:  
 `pip install pygame`  
 or  
 `pip3 install pygame` if it doesn't work. 
 
-In the Terminal, navigate to the folder where you unzipped the game. For example:  
+In the Terminal, navigate to the folder where you unzipped the game. For example:   
 `cd Downloads/Steps-Till-Dawn-main`  
 
 Then run:
 `python main.py`  
 or  
-`python3 main.py  
+`python3 main.py`  
 
 Have fun :D
 
