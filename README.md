@@ -49,8 +49,8 @@ Have fun :D
 - `i`: Open inventory
 - `s`: Save  
 
-## Project Structure
-Steps-Till-Dawn/
+## Project Structure  
+Steps-Till-Dawn/  
 ├── main.py              # Entry point  
 ├── game.py              # Main game logic  
 ├── scene.py             # Scene class  
