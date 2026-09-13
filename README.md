@@ -20,7 +20,7 @@ In this story, you need to find a way to bring your closest person back to life.
 The game includes 5 endings, collect all of them to unlock the hidden room and hidden story :) 
 
 ## How to Run
-～～use your leg～～
+~~use your leg~~
 
 Download and install Python 3.10+ from [python.org](https://www.python.org/downloads/).
 Windows users: check **"Add Python to PATH"** during installation.
