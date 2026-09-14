@@ -145,7 +145,7 @@ Original story: https://youtu.be/Sh820Sh9ffQ?si=uLel9zMxDBi2LJZQ
   
 ---  
   
-## 8. Appendix  
+## 8. Appendix  (spoiler alert)  
   
 ### 8.1 Controls   
 - `arrows` : Move  
