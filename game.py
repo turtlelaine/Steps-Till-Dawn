@@ -116,6 +116,10 @@ class Game:
             ]
         )
 
+        for obj in self.scenes["room1"].interaction_data:
+            if obj["name"] == "Clock":
+                obj["radius"] = 80
+
         self.current_scene_name = "room1"
         self.scene = self.scenes[self.current_scene_name]
 
