@@ -234,8 +234,8 @@ class Game:
         self.tv_opened = False
 
         # for ending test
-        self.endings_seen = {"ending1", "ending2", "ending3", "ending4", "ending5"}
-        self.check_all_endings()
+        #self.endings_seen = {"ending1", "ending2", "ending3", "ending4", "ending5"}
+        #self.check_all_endings()
 
     def load_endings(self):
         import json
