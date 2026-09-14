@@ -110,7 +110,8 @@ Didn't really solve this issue but I tried to finish them all within the date.
   
 ## 5. Future Improvements
 
-- Add more rooms and outdoor areas  
+- Add more rooms and outdoor areas
+- Chasing scenes  
 - Add more sound effects  
 - Improve dialogue box and inventory design  
 - Port to browser (by using Pygbag?)  
@@ -122,14 +123,15 @@ Didn't really solve this issue but I tried to finish them all within the date.
 ---
 
 ## 6. Known Limitations
-
-- The game only runs on desktop (Python required).
-- No mobile support.
-- Some story branches are linear and could be expanded.
-- Save files are local only (not cloud-synced).
-
----
-
+  
+- Pressing S writes to the first empty slot, or overwrites the oldest one if all slots are full. There is no in-game save/load menu. A proper save menu is a planned improvement.
+  
+- Object interaction uses a circular distance check instead of precise collision shapes. So objects placed close together may be ambiguous, and each object's interaction radius has to be tuned manually.
+  
+- Mouse input is not supported except for main page.
+  
+- Animation is frame-based instead of delta-time based. On displays with different refresh rates (e.g. 60Hz vs 144Hz), in-game animations may play at different speeds.
+  
 ## 7. References
 
 - BGM: 人狼の為の子守唄 https://dova-s.jp/zh-tw/bgm/detail/2853  
