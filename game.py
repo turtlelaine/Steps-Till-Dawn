@@ -234,8 +234,8 @@ class Game:
         self.tv_opened = False
 
         # for ending test
-        #self.endings_seen = {"ending1", "ending2", "ending3", "ending4", "ending5"}
-        #self.check_all_endings()
+        self.endings_seen = {"ending1", "ending2", "ending3", "ending4", "ending5"}
+        self.check_all_endings()
 
     def load_endings(self):
         import json
@@ -973,13 +973,13 @@ class Game:
             self.screen.blit(fade_surface, (0, 0))
 
         # coordination assist
-        font = pygame.font.Font(None, 24)
-        coord_text = font.render(f"Char: ({self.x}, {self.y})", True, (255, 255, 0))
-        self.screen.blit(coord_text, (10, 10))
+        #font = pygame.font.Font(None, 24)
+        #coord_text = font.render(f"Char: ({self.x}, {self.y})", True, (255, 255, 0))
+        #self.screen.blit(coord_text, (10, 10))
 
-        mouse_x, mouse_y = pygame.mouse.get_pos()
-        mouse_text = font.render(f"Mouse: ({mouse_x}, {mouse_y})", True, (0, 255, 0))
-        self.screen.blit(mouse_text, (10, 35))
+        #mouse_x, mouse_y = pygame.mouse.get_pos()
+        #mouse_text = font.render(f"Mouse: ({mouse_x}, {mouse_y})", True, (0, 255, 0))
+        #self.screen.blit(mouse_text, (10, 35))
 
         # portal hint
         if self.current_portal and not self.dialogue_choices:

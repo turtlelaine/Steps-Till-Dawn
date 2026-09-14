@@ -486,7 +486,7 @@ STORY = {
         "lines": [
             "You closed the diary.",
             "",
-            "A strong feeling came up to your mind.",
+            "A strong feeling came up.",
             "that he's still alive somewhere.",
             '"I will find you. "',
             "You remembered the clock.",
