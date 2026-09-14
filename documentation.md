@@ -132,12 +132,16 @@ Didn't really solve this issue but I tried to finish them all within the date.
 
 ## 7. References
 
-- BGM: 人狼の為の子守唄 https://dova-s.jp/zh-tw/bgm/detail/2853
-- Reference (tutorial): https://youtu.be/tJiKYMQJnYg?si=fmmF3sYKbU2sBsAI (collision map)
+- BGM: 人狼の為の子守唄 https://dova-s.jp/zh-tw/bgm/detail/2853  
+- Reference (tutorial): https://youtu.be/tJiKYMQJnYg?si=fmmF3sYKbU2sBsAI (collision map)  
 - https://youtu.be/__mZO-53PPM?si=SRh9qqoho6ruJoFU (how to save and load)  
-
+- Assets reference:  
+  https://www.pinterest.com/pin/979181143990275060/  
+  https://www.pinterest.com/pin/979181143987484547/  
+  https://www.pinterest.com/pin/754282637614821948/  
+  
 Original story: https://youtu.be/Sh820Sh9ffQ?si=uLel9zMxDBi2LJZQ  
-(I'll be happy if you like it. :])
+(I'll be happy if you like it. :])  
   
 ---  
   
