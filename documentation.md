@@ -26,6 +26,9 @@ I wanted to show different endings for a long time, so I used the same story.
   
 The original story link and storyboard: https://docs.google.com/document/d/150bIctI2PqlJcy5lcPoHBytz82SWYEXoIcR5rhbnJiw/edit?usp=sharing  
 (all in Chinese)  
+
+Presentation:  
+https://canva.link/06r104lrl8fsgmp  
   
 Earliest character design for the story:  
 <img width="4000" height="5000" alt="Untitled_Artwork 13" src="https://github.com/user-attachments/assets/7cdcb170-df82-4721-b9f5-3a509b0b5369" />  
