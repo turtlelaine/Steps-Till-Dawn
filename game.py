@@ -129,8 +129,9 @@ class Game:
         self.inventory = []
         self.bookshelf_checked = 0
         self.kitchen_unlocked = False
-        self.endings_seen = self.load_endings()          # endings check
+        self.endings_seen = self.load_endings()   # endings check
         self.total_endings = 5             # total endings to checc
+        self.check_all_endings()
 
         # dialogue system
         self.dialogue_choices = None
@@ -237,7 +238,7 @@ class Game:
         self.kitchen_timer_duration = 180
         self.tv_opened = False
 
-        # for ending test
+        #for ending test
         #self.endings_seen = {"ending1", "ending2", "ending3", "ending4", "ending5"}
         #self.check_all_endings()
 
@@ -1175,7 +1176,6 @@ class Game:
             self.tv_disabled = data.get("tv_disabled", False)
 
             # load endings
-            self.endings_seen = set(data.get("endings_seen", []))
             self.true_ending_unlocked = data.get("true_ending_unlocked", False)
 
             # 彩蛋：D
@@ -1247,7 +1247,6 @@ class Game:
             "keys_collected": list(self.keys_collected),
             "inventory": self.inventory,
             "bookshelf_checked": self.bookshelf_checked,
-            "endings_seen": list(self.endings_seen),
             "loop_count": self.loop_count,
             "sleep_count": self.sleep_count,
             "kitchen_unlocked": self.kitchen_unlocked,
@@ -1280,8 +1279,8 @@ class Game:
         #to see if all endings collected--> unlock key 3 to room 4
         if len(self.endings_seen) >= self.total_endings:
             if "key3" not in self.keys_spawned and "key3" not in self.keys_collected:
-                self.spawn_key("key3", "He hid that much keys here??")
                 self.keys_spawned.add("key3")
+                self.spawn_key("key3", "He hid that much keys here??")
                 print("a new key has been found in your inventory.")
 
     def should_exit(self):

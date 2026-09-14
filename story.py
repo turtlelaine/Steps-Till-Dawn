@@ -405,11 +405,11 @@ STORY = {
             "You replaced it with a new one.",
         ],
         "choices": None,
-        "next": "true_ending_2",
+        "next": "ending5",
         "position": "bottom"
     },
 
-    "true_ending_2": {
+    "ending5": {
         "lines": [
             "You returned to your daily life.",
             "You went to school, ate, hung out with friends.",
