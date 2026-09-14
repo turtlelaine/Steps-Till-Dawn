@@ -42,6 +42,7 @@ And then further simplify:
 Here they are :)  
 
 And all the maps below:  
+<img width="1280" height="800" alt="background" src="https://github.com/user-attachments/assets/b5869267-f6cf-46aa-b5ca-cd7d54956492" />  
 <img width="2240" height="1400" alt="Corridor" src="https://github.com/user-attachments/assets/311d1c59-4f45-4ea9-9163-0a95a5047b6a" />  
 <img width="2240" height="1400" alt="Room3bg" src="https://github.com/user-attachments/assets/33537345-2290-4374-8159-3cc7954d006a" />  
 <img width="2240" height="1400" alt="Room3bg 3" src="https://github.com/user-attachments/assets/466c6dc1-ff38-4891-ad85-c0ffa2593480" />  
