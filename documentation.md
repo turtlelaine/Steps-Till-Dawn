@@ -1,6 +1,6 @@
 # Steps Till Dawn — Documentation  
 
-**Author:** Turtle (Yi Ning Lam)
+**Author:** Turtle (Yi Ning Lam)  
 **Course:** Tech Basics I  
 **Date:** 14.09.2026  
 
@@ -23,8 +23,10 @@ The original story came from my short film last year, about a person who keeps r
 I wanted to show different endings for a long time, so I used the same story.
   
 ### 2.2 Early Sketches  
-The original story link: https://docs.google.com/document/d/150bIctI2PqlJcy5lcPoHBytz82SWYEXoIcR5rhbnJiw/edit?usp=sharing  
+  
+The original story link and storyboard: https://docs.google.com/document/d/150bIctI2PqlJcy5lcPoHBytz82SWYEXoIcR5rhbnJiw/edit?usp=sharing  
 (all in Chinese)  
+  
 Earliest character design for the story:  
 <img width="4000" height="5000" alt="Untitled_Artwork 13" src="https://github.com/user-attachments/assets/7cdcb170-df82-4721-b9f5-3a509b0b5369" />  
   
